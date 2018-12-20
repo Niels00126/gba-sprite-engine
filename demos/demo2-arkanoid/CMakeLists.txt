@@ -4,7 +4,7 @@ add_executable(${PROJECT_NAME}.elf
         src/main.cpp
         src/pats.h
         src/arkanoid_game_scene.cpp
-        src/arkanoid_game_scene.h src/spritedata.h src/dead.h)
+        src/arkanoid_game_scene.h src/spritedata.h src/dead.h src/balletje.h src/balletje.cpp src/balletje_data.h)
 
 target_link_libraries(${PROJECT_NAME}.elf gba-sprite-engine)
 

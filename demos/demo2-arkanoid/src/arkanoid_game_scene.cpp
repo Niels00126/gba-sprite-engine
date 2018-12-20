@@ -5,16 +5,41 @@
 #include <libgba-sprite-engine/sprites/sprite_builder.h>
 #include <libgba-sprite-engine/background/text_stream.h>
 
+#include <libgba-sprite-engine/gba_engine.h>
+#include <algorithm>
+#include <sstream>
+
 #include "arkanoid_game_scene.h"
 #include "spritedata.h"
 #include "pats.h"
 #include "dead.h"
 
+#include "balletje.h"
+#include "balletje_data.h"
+
+
+#define COOLDOWN_BALL_TICK 100
+
+
+
+
 std::vector<Sprite *> ArkanoidGameScene::sprites() {
-    return {
+    std::vector<Sprite*> sprites;
+
+    for(auto& b : ballen) {
+        sprites.push_back(b->getSprite());
+    }
+    sprites.push_back(person.get());
+    return sprites;
+
+    /*return {
         paddle.get(), ball.get()
-    };
+    };*/
 }
+
+
+
+
 
 std::vector<Background *> ArkanoidGameScene::backgrounds() {
     return {};
@@ -35,65 +60,101 @@ void ArkanoidGameScene::resetGame() {
     TextStream::instance().clear();
     ball->moveTo(110, 140);
     ball->setVelocity(1, 1);
-    paddle->moveTo(100, 150);
+    person->moveTo(100, 150);
+}
+void ArkanoidGameScene::shoot() {
+    int i = 0;
+    for(auto& b : ballen) {
+
+
+        if(  (person->getX() + (person->getWidth()/2 >= b->getSprite()->getX() )&& person->getX() +  (person->getWidth()/2) <= b->getSprite()->getX()+b->getSprite()->getWidth() ) ){
+            ballen.erase(ballen.begin()+i);
+            return;
+        }
+        i++;
+    }
 }
 
 void ArkanoidGameScene::tick(u16 keys) {
-    if(dead && (keys & KEY_START)) {
-        resetGame();
-        return;
-    }
 
-    if(dead) return;
+    //if(dead) return;
 
     TextStream::instance().setText(std::string("Ticks: ") + std::to_string(ticks), 5, 10);
     TextStream::instance().setText(std::string("Highscore: ") + std::to_string(highscore), 7, 10);
 
-    if(ball->getX() <= 0 || ball->getX() >= (GBA_SCREEN_WIDTH - ball->getWidth())) {
-        ball->setVelocity(-ball->getDx(), ball->getDy());
-    }else if(ball->getY() <= 0) {
-        ball->setVelocity(ball->getDx(), -ball->getDy());
-    } else if(ball->getY() >= (GBA_SCREEN_HEIGHT - ball->getHeight())) {
-       youDied();
-       return;
-    } else if(ball->collidesWith(*paddle)) {
-        if(ticks > 1 && ticks % 5 == 0) {
-            ball->setVelocity(ball->getDx() + 1, ball->getDy() + 1);
+
+
+
+    //if(BallTickCooldown > 0) {
+    //    BallTickCooldown--;
+    //} else if(BallTickCooldown == 0) {
+        for(auto &b : ballen) {
+            b->tick();
         }
+      //  BallTickCooldown = COOLDOWN_BALL_TICK;
+    //}
 
-        // lousy implementation; ball could also hit paddle from right/left, meaning *BOOM*
-        ball->setVelocity(ball->getDx(), -ball->getDy());
-        engine.get()->enqueueSound(pats, sizeof(pats), 32000);
 
-        ticks++;
-    }
 
     if(keys & KEY_LEFT) {
-        paddle->setVelocity(-2, 0);
+        person->setVelocity(-2, 0);
     } else if(keys & KEY_RIGHT) {
-        paddle->setVelocity(+2, 0);
+        person->setVelocity(+2, 0);
     } else {
-        paddle->setVelocity(0, 0);
+        person->setVelocity(0, 0);
     }
+    if((keys & KEY_A)) {
+
+            ballen.push_back(createBall());
+           // b->setDestination(randomDestinations[rand() % 6]);
+
+    }
+    if( keys & KEY_UP) {
+        shoot();
+    }
+
+
 }
+
+
+std::unique_ptr<Balletje> ArkanoidGameScene::createBall() {
+    return std::unique_ptr<Balletje>(new Balletje(spriteBuilder->withLocation(50,20).buildWithDataOf(*ball.get()) , 3,1,1 ));
+
+                                                      //withLocation(avatar->getX() + avatar->getWidth() / 2, avatar->getY() + avatar->getHeight() / 2)
+                                                      //.buildWithDataOf(*ball.get())));
+}
+
+
+
 
 void ArkanoidGameScene::load() {
     foregroundPalette = std::unique_ptr<ForegroundPaletteManager>(new ForegroundPaletteManager(paletteSharedPal, sizeof(paletteSharedPal)));
     backgroundPalette = std::unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager());
 
+    spriteBuilder = std::unique_ptr<SpriteBuilder<Sprite>>(new SpriteBuilder<Sprite>);
     SpriteBuilder<Sprite> builder;
 
-    ball = builder
-            .withSize(SIZE_8_8)
+    ball = spriteBuilder
+            ->withSize(SIZE_8_8)
             .withLocation(110, 140)
             .withData(ballTiles, sizeof(ballTiles))
             .withVelocity(1, 1)
             .buildPtr();
 
-    paddle = builder
+
+    /*someBulletSprite = spriteBuilder->withData(bullet_data, sizeof(bullet_data))
+            .withSize(SIZE_16_16)
+            .withLocation(GBA_SCREEN_WIDTH + 20, GBA_SCREEN_HEIGHT + 20)
+            .buildPtr();
+    */
+
+    person = builder
             .withSize(SIZE_32_8)
             .withLocation(100, 150)
             .withData(paddleTiles, sizeof(paddleTiles))
             .withinBounds()
             .buildPtr();
+
+
+
 }

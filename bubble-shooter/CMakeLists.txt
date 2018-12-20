@@ -1,14 +1,8 @@
-project(flyingstuff)
+project(bubble-shooter)
 
 add_executable(${PROJECT_NAME}.elf
         src/main.cpp
-        src/sample_start_scene.cpp
-        src/sample_start_scene.h
-        src/lama.h
-        src/sample_sound.h
-        src/kul.h
-        src/flying_stuff_scene.cpp
-        src/flying_stuff_scene.h src/ball.h src/ball.cpp)
+        src/SceneLevel1.cpp src/SceneLevel1.h src/sprites_front.h src/Ball.cpp src/Ball.h)
 
 target_link_libraries(${PROJECT_NAME}.elf gba-sprite-engine)
 

@@ -10,11 +10,6 @@
 #include "sample_start_scene.h"
 #include "flying_stuff_scene.h"
 
-#include "ball.h"
-#include "ball.cpp"
-
-
-
 #include "lama.h"
 #include "sample_sound.h"
 

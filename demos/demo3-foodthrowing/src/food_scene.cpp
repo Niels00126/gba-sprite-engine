@@ -37,8 +37,7 @@ std::vector<Sprite *> FoodScene::sprites() {
 
 void FoodScene::removeBulletsOffScreen() {
     bullets.erase(
-            std::remove_if(bullets.begin(), bullets.end(), [](std::unique_ptr<Bullet> &s) { return s->isOffScreen(); }),
-            bullets.end());
+            std::remove_if(bullets.begin(), bullets.end(), [](std::unique_ptr<Bullet> &s) { return s->isOffScreen(); }),  bullets.end());
 }
 
 std::string hex(int val) {
