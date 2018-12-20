@@ -2,7 +2,7 @@ project(bubble-shooter)
 
 add_executable(${PROJECT_NAME}.elf
         src/main.cpp
-        src/SceneLevel1.cpp src/SceneLevel1.h src/sprites_front.h src/Ball.cpp src/Ball.h)
+        src/SceneLevel1.cpp src/SceneLevel1.h src/sprites_front.h src/Ball.cpp src/Ball.h src/background.h)
 
 target_link_libraries(${PROJECT_NAME}.elf gba-sprite-engine)
 

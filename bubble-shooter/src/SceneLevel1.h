@@ -8,7 +8,8 @@
 #include <libgba-sprite-engine/gba_engine.h>
 #include <libgba-sprite-engine/scene.h>
 #include <libgba-sprite-engine/sprites/sprite_builder.h>
-#include <libgba-sprite-engine/sprites/affine_sprite.h> // niet perse nodig
+#include <libgba-sprite-engine/sprites/affine_sprite.h> // niet perse nodig // background
+#include <libgba-sprite-engine/background/background.h> // background
 
 #include <vector>
 #include "Ball.h"
@@ -29,7 +30,8 @@ private:
     std:: unique_ptr<Sprite> Bullet;
     u32 bulletCooldown;
 
-
+   // std::unique_ptr<AffineSprite> kulFlying; // background
+    std::unique_ptr<Background> bg; // background
 
 
     std::vector<std::unique_ptr<Ball>> ballen;
@@ -52,7 +54,7 @@ private:
 public:
     SceneLevel1(std::shared_ptr<GBAEngine> engine) : Scene(engine) {}
     std::vector<Sprite *> sprites() override;
-    std::vector<Background *> backgrounds() override;
+    std::vector<Background *> backgrounds() override;// background
 
     void load() override;
     void tick(u16 keys) override;

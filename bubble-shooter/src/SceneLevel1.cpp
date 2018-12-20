@@ -10,6 +10,7 @@
 
 #include "SceneLevel1.h"
 #include "sprites_front.h"
+#include "background.h"
 #include "Ball.h"
 
 #define MAXBULLETS 2
@@ -24,9 +25,7 @@
 #define RIGHT 1
 #define UP -1
 #define Down 1
-
-
-
+//TEST
 #define StartGame 1
 int Game = 0;
 
@@ -41,8 +40,6 @@ void SceneLevel1:: bullet_offScreen(){
         i++;
     }
 }
-
-
 
 void SceneLevel1::ball_hit_person(){
     int i = 0;
@@ -130,7 +127,9 @@ std::vector<Sprite *> SceneLevel1::sprites() {
 }
 
 std::vector<Background *> SceneLevel1::backgrounds() {
-    return {};
+    return {
+            bg.get()
+    };
 }
 
 
@@ -156,7 +155,8 @@ std::unique_ptr<Sprite> SceneLevel1::createBullet(){
 
 void SceneLevel1::load() {
     foregroundPalette = std::unique_ptr<ForegroundPaletteManager>(new ForegroundPaletteManager(sharedPal,sizeof(sharedPal)));
-    backgroundPalette = std:: unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager());
+    //backgroundPalette = std:: unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager());
+    backgroundPalette = std::unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager(background_tiles_spongebobPal, sizeof(background_tiles_spongebobPal)));
 
     spriteBuilder = std::unique_ptr<SpriteBuilder<Sprite>>(new SpriteBuilder<Sprite>);
     SpriteBuilder<Sprite> builder;
@@ -192,7 +192,9 @@ void SceneLevel1::load() {
             .withLocation(150, GBA_SCREEN_HEIGHT-16)
             .buildPtr();
 
-
+    //bg = std::unique_ptr<Background>(new Background(1, background_data, sizeof(background_data), map, sizeof(map)));
+    bg = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob, sizeof(map_spongebob)));
+    bg.get()->useMapScreenBlock(16);
 }
 
 void SceneLevel1::tick(u16 keys) {
