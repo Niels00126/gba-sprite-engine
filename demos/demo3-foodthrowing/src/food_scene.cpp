@@ -92,13 +92,7 @@ void FoodScene::tick(u16 keys) {
     if((keys & KEY_A)) {
         avatar->animateToFrame(1);
 
-        if(allowedToShoot && bullets.size() < MAX_AMOUNT_OF_BULLETS) {
-            bulletCooldown = BULLET_COOLDOWN_START;
-            bullets.push_back(createBullet());
-
-            auto &b = bullets.at(bullets.size() - 1);
-            b->setDestination(randomDestinations[rand() % 6]);
-        }
+        BULLET_COOLDOWN_START
     }
 
     avatar->rotate(avatarRotation);

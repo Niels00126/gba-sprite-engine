@@ -13,6 +13,7 @@
 #include "Ball.h"
 
 #define MAXBULLETS 2
+#define BULLET_COOLDOWN_START 20
 
 
 #define BALLKLEIN		 0
@@ -72,71 +73,38 @@ void SceneLevel1:: dead(){
 }*/
 
 
-void SceneLevel1:: bullet_hit_ball(){
-    int i = 0;
-
-    std::vector<std::unique_ptr<Ball>> ballen_temp;
-    //std::vector<Ball> ballen_temp;
-    //std::vector<Ball> ballen1;
-    //copy_vector(ballen_temp,ballen);
-
-    //std::copy(ballen.begin(),ballen.end(),std::back_inserter(ballen_temp));
-    //ballen_temp.reserve(ballen.size());
-    //std::copy(ballen1.begin(),ballen1.end(),std::back_inserter(ballen_temp));
-
-   // std::copy(ballen.begin(),ballen.end(),std::back_inserter(ballen_temp));
-
-    //std::vector<std::unique_ptr<Sprite>> bullets_temp;
-    //bullets_temp.reserve(bullets.size());
-    //copy(bullets.begin(),bullets.end(),back_inserter(bullets_temp));
-
-
-    std::vector<Ball> from_vector;
-    //std::iota(from_vector.begin(), from_vector.end(), 0);
-
-    std::vector<Ball> to_vector;
-    std::copy(from_vector.begin(), from_vector.end(),
-              std::back_inserter(to_vector));
-
-    for(auto &bul : bullets) {
-        int y = 0;
-
+void SceneLevel1:: check_bullet_hit_ball(){
+    int erase_bullet=-1;
+    int erase_ball=-1;
+    int bul_for = 0;
+    int bal_for = 0;
+    for(auto &bul : bullets){
 
         for(auto &bal : ballen){
 
-
             if( bul.get()->collidesWith(*bal->getSprite())){
+
                 score++;
                 TextStream::instance().setText(std::string("Score: ")+ std::to_string(score), 0, 0);
-
                 if( bal->getNumber() !=  BALLKLEIN){
-                    //ballen.push_back(createBall( (BALLKLEIN),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                     ballen.push_back(createBall( (bal->getNumber()-1),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                     ballen.push_back(createBall( (bal->getNumber()-1),RIGHT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
-
-                    //ballen_temp.push_back(createBall( (bal->getNumber()-1),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
-                    //ballen_temp.push_back(createBall( (bal->getNumber()-1),RIGHT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                 }
 
-               //ballen.push_back(createBall(BALLKLEIN,1,-1,30,60));
+                erase_ball = bal_for;
+                erase_bullet = bul_for;
+                break;
 
-
-                //ballen_temp.erase(ballen_temp.begin()+y);
-                //bullets_temp.erase(bullets_temp.begin()+y);
-
-                bullets.erase(bullets.begin()+i);
-                ballen.erase(ballen.begin()+y);
-
-
-
-                //return;
             }
-            y++;
+            bal_for++;
         }
-        i++;
+        if(erase_ball >= 0 && erase_ball >=0){
+                ballen.erase(ballen.begin()+erase_ball);
+                bul->moveTo(-10,-10);
+                break;
+        }
+        bul_for++;
     }
-    //copy(ballen.begin(),ballen.end(),back_inserter(ballen_temp));
-    //copy(bullets.begin(),bullets.end(),back_inserter(bullets_temp));
 
 }
 
@@ -183,12 +151,8 @@ std::unique_ptr<Ball> SceneLevel1::createBall(int number, int dx, int dy,int pos
 }
 
 std::unique_ptr<Sprite> SceneLevel1::createBullet(){
-
     return  spriteBuilder->withLocation((Person.get()->getX() + (Person.get()->getWidth())/2 - (Bullet.get()->getWidth()/2)) , (GBA_SCREEN_HEIGHT-Person.get()->getHeight()-Bullet.get()->getHeight())).withVelocity(0,-5).buildWithDataOf(*Bullet.get());
 }
-
-
-
 
 void SceneLevel1::load() {
     foregroundPalette = std::unique_ptr<ForegroundPaletteManager>(new ForegroundPaletteManager(sharedPal,sizeof(sharedPal)));
@@ -251,18 +215,25 @@ void SceneLevel1::tick(u16 keys) {
         Person->setVelocity(0, 0);
     }
     if((keys & KEY_A)) {
-
-
         ballen.push_back(createBall(BALLGROOT,1,-1,70,100));
-        // b->setDestination(randomDestinations[rand() % 6]);
-
     }
-    if( keys & KEY_UP && bullets.size()< MAXBULLETS) {
+
+    bool allowedToShoot = false;
+
+    if(bulletCooldown > 0) {
+        bulletCooldown--;
+    } else if(bulletCooldown == 0) {
+        allowedToShoot = true;
+    }
+
+    if( keys & KEY_UP && bullets.size()< MAXBULLETS & allowedToShoot) {
+        bulletCooldown = BULLET_COOLDOWN_START;
         bullets.push_back(createBullet());
     }
 
+
     bullet_offScreen();
-    bullet_hit_ball();
+    check_bullet_hit_ball();
     ball_hit_person();
     for(auto &b : ballen) {
         b->tick();

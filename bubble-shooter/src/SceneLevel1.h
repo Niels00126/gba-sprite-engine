@@ -27,6 +27,7 @@ private:
     std:: unique_ptr<Sprite> BallSmall;
     std:: unique_ptr<Sprite> Person;
     std:: unique_ptr<Sprite> Bullet;
+    u32 bulletCooldown;
 
 
 
@@ -39,7 +40,7 @@ private:
     std::unique_ptr<Sprite> createBullet();
     void shoot();
     void bullet_offScreen();
-    void bullet_hit_ball();
+    void check_bullet_hit_ball();
     void personHit();
     void ball_hit_person();
     void dead();
