@@ -45,10 +45,10 @@ void SampleStartScene::load() {
 
 void SampleStartScene::tick(u16 keys) {
     if(keys & KEY_START) {
-        if(!engine->isTransitioning()) {
-            engine->enqueueSound(zelda_secret_16K_mono, zelda_secret_16K_mono_bytes);
+                if(!engine->isTransitioning()) {
+                    engine->enqueueSound(zelda_secret_16K_mono, zelda_secret_16K_mono_bytes);
 
-            TextStream::instance() << "entered: starting next scene";
+                    TextStream::instance() << "entered: starting next scene";
 
             engine->transitionIntoScene(new FlyingStuffScene(engine), new FadeOutScene(2));
         }
