@@ -12,31 +12,39 @@
 
 
 #define MAXBULLETS 10
-#define BULLET_COOLDOWN_START 20
+#define BULLET_COOLDOWN_START 10
 #define ERASE_NOTHING  -1
 
 
 
 
+void SceneLevel1:: bullet_delete(){
 
-
-void SceneLevel1:: bullet_offScreen(){
     int i = 0;
     int delete_buller_number = -1;
-    for(auto &b : bullets) {
 
-        if(b.get()->isOffScreen()){
-            delete_buller_number = i;
-            break;
+    int bullet_erase = bullet_offScreen();
 
-        }
-        i++;
-    }
-    if( delete_buller_number >=0 ){
-        bullets.erase(bullets.begin()+i);
+    if(  bullet_erase != ERASE_NOTHING ){
+        bulletCooldown +=5;
+        bullets.erase(bullets.begin()+ bullet_erase);
         TextStream::instance().setText(std::string("Aantal bullets: ")+ std::to_string(bullets.size()), 7, 0);
     }
     return;
+
+}
+
+int SceneLevel1:: bullet_offScreen(){
+
+    int bul_for = 0;
+    for(auto &b : bullets) {
+
+        if(b.get()->isOffScreen() || b->getY() == 0){
+            return bul_for;
+        }
+        bul_for++;
+    }
+    return ERASE_NOTHING;
 }
 
 void SceneLevel1::ball_hit_person(){
@@ -60,41 +68,42 @@ void SceneLevel1:: dead(){
 int SceneLevel1:: bullet_collides_ball(){
 
 
+    for(auto &bul : bullets){
+            int bal_for = 0;
+            for(auto &bal : ballen){
+
+                if( bul.get()->collidesWith(*bal->getSprite())){
+
+                    score++;
+                    TextStream::instance().setText(std::string("Score: ")+ std::to_string(score), 1, 4);
+
+                    if( bal->getNumber() !=  BALLKLEIN){
+                        ballen.push_back(createBall( (bal->getNumber()-1),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
+                        ballen.push_back(createBall( (bal->getNumber()-1),RIGHT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
+                    }
+                    bul->moveTo(-100,-100);
+                    return bal_for;
+
+                }
+                bal_for++;
+            }
+
+
+    }
+
+return ERASE_NOTHING;
+
 }
 
 void SceneLevel1:: check_bullet_hit_ball(){
-    //int erase_bullet=-1;
-    int erase_ball= ERASE_NOTHING;
-    int bul_for = 0;
-    int bal_for = 0;
-    for(auto &bul : bullets){
 
-        for(auto &bal : ballen){
+    int ball_erase = bullet_collides_ball();
 
-            if( bul.get()->collidesWith(*bal->getSprite())){
+    if( ball_erase != ERASE_NOTHING){
+        ballen.erase(ballen.begin()+ ball_erase);
 
-                score++;
-                TextStream::instance().setText(std::string("Score: ")+ std::to_string(score), 1, 4);
-
-                if( bal->getNumber() !=  BALLKLEIN){
-                    ballen.push_back(createBall( (bal->getNumber()-1),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
-                    ballen.push_back(createBall( (bal->getNumber()-1),RIGHT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
-                }
-
-                erase_ball = bal_for;
-                break;
-
-            }
-            bal_for++;
-        }
-        if(erase_ball != ERASE_NOTHING){
-            ballen.erase(ballen.begin()+erase_ball);
-            TextStream::instance().setText(std::string("Aantal ballen: ")+ std::to_string(ballen.size()), 6, 0);
-            bul->moveTo(-100,-100);
-            break;
-        }
-        bul_for++;
     }
+
 
 }
 
@@ -137,8 +146,7 @@ std::unique_ptr<Ball> SceneLevel1::createBall(int number, int dx, int dy,int pos
     else{
         return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*BallBig.get()) , 0,dx,dy ));
     }
-    //withLocation(avatar->getX() + avatar->getWidth() / 2, avatar->getY() + avatar->getHeight() / 2)
-    //.buildWithDataOf(*ball.get())));
+
 }
 
 std::unique_ptr<Sprite> SceneLevel1::createBullet(){
@@ -180,7 +188,7 @@ void SceneLevel1::load_always() {
     Person = spriteBuilder
             ->withData(man1616_v1Tiles, sizeof(man1616_v1Tiles))
             .withSize(SIZE_16_16)
-            .withLocation(150, GBA_SCREEN_HEIGHT-16)
+            .withLocation(50, GBA_SCREEN_HEIGHT-16)
             .buildPtr();
 
     //bg = std::unique_ptr<Background>(new Background(1, background_data, sizeof(background_data), map, sizeof(map)));
@@ -191,24 +199,17 @@ void SceneLevel1::load_always() {
 
 
 void SceneLevel1:: tick_always(u16 keys){
-    if(keys & KEY_LEFT) {
-        Person->setVelocity(-2, 0);
-
-
-    } else if(keys & KEY_RIGHT) {
-        Person->setVelocity(+2, 0);
-
-    } else {
-        Person->setVelocity(0, 0);
-    }
+    TextStream::instance().setText(std::string("Aantal ballen: ")+ std::to_string(ballen.size()), 6, 0);
     if((keys & KEY_A)) {
-        ballen.push_back(createBall(BALLGROOT,1,-1,70,100));
+        //ballen.push_back(createBall(BALLGROOT,1,-1,70,100));
+        ballen.clear();
     }
 
     bool allowedToShoot = false;
 
     if(bulletCooldown > 0) {
         bulletCooldown--;
+        TextStream::instance().setText(std::string("Bullet cooldown: ")+ std::to_string(bulletCooldown), 3, 6);
     } else if(bulletCooldown == 0) {
         allowedToShoot = true;
     }
@@ -220,7 +221,8 @@ void SceneLevel1:: tick_always(u16 keys){
     }
 
 
-    bullet_offScreen();
+    //bullet_offScreen();
+    bullet_delete();
     check_bullet_hit_ball();
     ball_hit_person();
     for(auto &b : ballen) {

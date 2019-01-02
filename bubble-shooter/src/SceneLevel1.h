@@ -40,7 +40,7 @@ public:
     std::unique_ptr<Ball> createBall(int number, int dx, int dy,int posX, int posY);
     std::unique_ptr<Sprite> createBullet();
     void shoot();
-    void bullet_offScreen();
+    int bullet_offScreen();
     void check_bullet_hit_ball();
     void personHit();
     void ball_hit_person();
@@ -53,7 +53,7 @@ public:
     std:: unique_ptr<Sprite> BallSmall;
     std:: unique_ptr<Sprite> Person;
     std:: unique_ptr<Sprite> Bullet;
-    u32 bulletCooldown;
+    u32 bulletCooldown=0;
 
     std::unique_ptr<Background> bg; // background
 
@@ -64,7 +64,13 @@ public:
     std::vector<Background *> backgrounds() override;// background
 
 
+    int bullet_collides_ball();
+    void bullet_delete();
+
+    //SceneLevel1(std::shared_ptr<GBAEngine> engine, int start_score) : Scene(engine), score(start_score) {}
+
     SceneLevel1(std::shared_ptr<GBAEngine> engine) : Scene(engine) {}
+
     //virtual void load() override;
     //virtual void tick(u16 keys) override;
 

@@ -18,6 +18,7 @@ private:
 public:
     Ball(std::unique_ptr<Sprite> sprite, int number, int dx, int dy) : sprite(std::move(sprite)), number(number), dx(dx), dy(dy)  {}
     void tick();
+    void setDx(int dx_new){ dx = dx_new;};
     Sprite* getSprite() { return sprite.get(); }
     int getNumber() {return number;}
 
