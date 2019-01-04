@@ -18,92 +18,83 @@
 
 
 
-void SceneLevel1:: bullet_delete(){
+void SceneLevel1:: bulletDelete(){
 
     int i = 0;
-    int delete_buller_number = -1;
 
-    int bullet_erase = bullet_offScreen();
+    int numberBulletErase = bulletOffScreen();
 
-    if(  bullet_erase != ERASE_NOTHING ){
+    if(  numberBulletErase != ERASE_NOTHING ){
         bulletCooldown +=5;
-        bullets.erase(bullets.begin()+ bullet_erase);
-        TextStream::instance().setText(std::string("Aantal bullets: ")+ std::to_string(bullets.size()), 7, 0);
+        bullets.erase(bullets.begin()+ numberBulletErase);
+
+
     }
     return;
 
 }
 
-int SceneLevel1:: bullet_offScreen(){
+int SceneLevel1:: bulletOffScreen(){
 
-    int bul_for = 0;
+    int bulletCnt = 0;
     for(auto &b : bullets) {
 
         if(b.get()->isOffScreen() || b->getY() == 0){
-            return bul_for;
+            return bulletCnt;
         }
-        bul_for++;
+        bulletCnt++;
     }
     return ERASE_NOTHING;
 }
 
-void SceneLevel1::ball_hit_person(){
-    int i = 0;
-    for(auto &b : ballen) {
+void SceneLevel1::ballHitPerson(){
 
-        if(b.get()->getSprite()->collidesWith(*Person.get())){
+    for(auto &b : ballen) {
+        if(b.get()->getSprite()->collidesWith(*person.get())){
             dead();
         }
-        i++;
     }
+
 }
 
 void SceneLevel1:: dead(){
-    TextStream::instance().setText(std::string("You are dead!"), 5, 10);
-
+    TextStream::instance().setText(std::string("You are dead! Je kan er niets meer aan doen!"), 9, 0);
     while(1){}
 
 }
 
-int SceneLevel1:: bullet_collides_ball(){
-
+int SceneLevel1:: bulletcollidesBall(){
 
     for(auto &bul : bullets){
-            int bal_for = 0;
+            int balCnt = 0;
             for(auto &bal : ballen){
 
                 if( bul.get()->collidesWith(*bal->getSprite())){
 
                     score++;
-                    TextStream::instance().setText(std::string("Score: ")+ std::to_string(score), 1, 4);
+
 
                     if( bal->getNumber() !=  BALLKLEIN){
                         ballen.push_back(createBall( (bal->getNumber()-1),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                         ballen.push_back(createBall( (bal->getNumber()-1),RIGHT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                     }
                     bul->moveTo(-100,-100);
-                    return bal_for;
+                    return balCnt;
 
                 }
-                bal_for++;
+                balCnt++;
             }
-
-
     }
-
-return ERASE_NOTHING;
-
+    return ERASE_NOTHING;
 }
 
-void SceneLevel1:: check_bullet_hit_ball(){
+void SceneLevel1:: checkBulletHitBall(){
 
-    int ball_erase = bullet_collides_ball();
+    int numberBulletErase = bulletcollidesBall();
 
-    if( ball_erase != ERASE_NOTHING){
-        ballen.erase(ballen.begin()+ ball_erase);
-
+    if( numberBulletErase != ERASE_NOTHING){
+        ballen.erase(ballen.begin()+ numberBulletErase);
     }
-
 
 }
 
@@ -117,12 +108,11 @@ std::vector<Sprite *> SceneLevel1::sprites() {
         sprites.push_back(b.get());
     }
 
-
-    sprites.push_back(BallSmall.get());
-    sprites.push_back(BallBig.get());
-    sprites.push_back(BallMedium.get());
-    sprites.push_back(Bullet.get());
-    sprites.push_back(Person.get());
+    sprites.push_back(ballSmall.get());
+    sprites.push_back(ballBig.get());
+    sprites.push_back(ballMedium.get());
+    sprites.push_back(bullet.get());
+    sprites.push_back(person.get());
     return sprites;
 
 }
@@ -134,82 +124,102 @@ std::vector<Background *> SceneLevel1::backgrounds() {
 }
 
 
-std::unique_ptr<Ball> SceneLevel1::createBall(int number, int dx, int dy,int posX, int posY) {
-    if( number == BALLKLEIN){
-        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*BallSmall.get()) , BALLKLEIN,dx,dy ));
-    }else if(number == BALLMIDDEL){
-        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*BallMedium.get()) , BALLMIDDEL,dx,dy ));
+std::unique_ptr<Ball> SceneLevel1::createBall(int ballType, int dx, int dy,int posX, int posY) {
+
+    if( ballType == BALLKLEIN){
+        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*ballSmall.get()) , BALLKLEIN,dx,dy ));
     }
-    else if(number == BALLGROOT){
-        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*BallBig.get()) , BALLGROOT,dx,dy ));
+    else if(ballType == BALLMIDDEL){
+        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*ballMedium.get()) , BALLMIDDEL,dx,dy ));
+    }
+    else if(ballType == BALLGROOT){
+        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*ballBig.get()) , BALLGROOT,dx,dy ));
     }
     else{
-        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*BallBig.get()) , 0,dx,dy ));
+        return std::unique_ptr<Ball>(new Ball(spriteBuilder->withLocation(posX,posY).buildWithDataOf(*ballBig.get()) , BALLGROOT,dx,dy ));
     }
 
 }
 
 std::unique_ptr<Sprite> SceneLevel1::createBullet(){
-    return  spriteBuilder->withLocation((Person.get()->getX() + (Person.get()->getWidth())/2 - (Bullet.get()->getWidth()/2)) , (GBA_SCREEN_HEIGHT-Person.get()->getHeight()-Bullet.get()->getHeight())).withVelocity(0,-5).buildWithDataOf(*Bullet.get());
+    return  spriteBuilderBullet->withLocation((person.get()->getX() + (person.get()->getWidth())/2 - (bullet.get()->getWidth()/2)) , (GBA_SCREEN_HEIGHT-person.get()->getHeight()-bullet.get()->getHeight())).withVelocity(0,-5).buildWithDataOf(*bullet.get());
 }
 
-void SceneLevel1::load_always() {
-    foregroundPalette = std::unique_ptr<ForegroundPaletteManager>(new ForegroundPaletteManager(sharedPal,sizeof(sharedPal)));
-    //backgroundPalette = std:: unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager());
+void SceneLevel1::loadAlways() {
 
+    foregroundPalette = std::unique_ptr<ForegroundPaletteManager>(new ForegroundPaletteManager(sharedPal,sizeof(sharedPal)));
     spriteBuilder = std::unique_ptr<SpriteBuilder<Sprite>>(new SpriteBuilder<Sprite>);
+    spriteBuilderBullet = std::unique_ptr<SpriteBuilder<Sprite>>(new SpriteBuilder<Sprite>);
     SpriteBuilder<Sprite> builder;
 
-    BallBig = spriteBuilder
+    ballBig = spriteBuilder
             ->withData(ball32Tiles, sizeof(ball32Tiles))
             .withSize(SIZE_32_32)
             .withLocation(-10, -10)
             .buildPtr();
 
-    BallMedium = spriteBuilder
+    ballMedium = spriteBuilder
             ->withData(ball16Tiles, sizeof(ball16Tiles))
             .withSize(SIZE_16_16)
             .withLocation(-10, -10)
             .buildPtr();
 
-    BallSmall = spriteBuilder
+    ballSmall = spriteBuilder
             ->withData(ball8Tiles, sizeof(ball8Tiles))
             .withSize(SIZE_8_8)
             .withLocation(-10, -10)
             .buildPtr();
 
-    Bullet = spriteBuilder
+    bullet = spriteBuilderBullet
             ->withData(bullet8Tiles, sizeof(bullet8Tiles))
             .withSize(SIZE_8_8)
             .withLocation(-10, -10)
             .buildPtr();
 
-    //->withData(man1632Tiles, sizeof(man1632Tiles)) man1616_v1Tiles
-    Person = spriteBuilder
+    person = spriteBuilder
             ->withData(man1616_v1Tiles, sizeof(man1616_v1Tiles))
             .withSize(SIZE_16_16)
             .withLocation(50, GBA_SCREEN_HEIGHT-16)
             .buildPtr();
+}
+void SceneLevel1:: text(){
+    TextStream::instance().setText(std::string("Score: ")+ std::to_string(score), 0, 0);
+    TextStream::instance().setText(std::string("Bullet cooldwn: ")+ std::to_string(bulletCooldown), 5, 0);
+    TextStream::instance().setText(std::string("Ballen: ")+ std::to_string(ballen.size()), 6, 0);
+    TextStream::instance().setText(std::string("Bullets: ")+ std::to_string(bullets.size()), 7, 0);
+}
 
-    //bg = std::unique_ptr<Background>(new Background(1, background_data, sizeof(background_data), map, sizeof(map)));
+void SceneLevel1:: movePerson(u16 keys) {
 
+    if(keys & KEY_LEFT) {
+
+        person->setVelocity(-2, 0);
+        scrollX++;
+        bg.get()->scroll(scrollX,0);
+
+    } else if(keys & KEY_RIGHT) {
+
+        person->setVelocity(+2, 0);
+        scrollX--;
+        bg.get()->scroll(scrollX,0);
+
+    } else {
+        person->setVelocity(0, 0);
+    }
 
 }
 
-
-
-void SceneLevel1:: tick_always(u16 keys){
-    TextStream::instance().setText(std::string("Aantal ballen: ")+ std::to_string(ballen.size()), 6, 0);
+void SceneLevel1:: tickAlways(u16 keys){
+    text();
     if((keys & KEY_A)) {
-        //ballen.push_back(createBall(BALLGROOT,1,-1,70,100));
-        ballen.clear();
+         ballen.clear();
     }
 
     bool allowedToShoot = false;
 
     if(bulletCooldown > 0) {
         bulletCooldown--;
-        TextStream::instance().setText(std::string("Bullet cooldown: ")+ std::to_string(bulletCooldown), 3, 6);
+
     } else if(bulletCooldown == 0) {
         allowedToShoot = true;
     }
@@ -217,14 +227,20 @@ void SceneLevel1:: tick_always(u16 keys){
     if( keys & KEY_UP && bullets.size()< MAXBULLETS & allowedToShoot) {
         bulletCooldown = BULLET_COOLDOWN_START;
         bullets.push_back(createBullet());
-        TextStream::instance().setText(std::string("Aantal bullets: ")+ std::to_string(bullets.size()), 7, 0);
+
+    }
+
+    if(game < GAMESTARTED){
+        atStartGame();
+        game++;
     }
 
 
-    //bullet_offScreen();
-    bullet_delete();
-    check_bullet_hit_ball();
-    ball_hit_person();
+    movePerson(keys);
+
+    bulletDelete();
+    checkBulletHitBall();
+    ballHitPerson();
     for(auto &b : ballen) {
         b->tick();
     }
@@ -239,7 +255,7 @@ void SceneLevel1:: tick_always(u16 keys){
             engine->transitionIntoScene(new SceneLevel2(engine), new FadeOutScene(2));
         }
     }*/
-/*tick_always(keys);
+/*tickAlways(keys);
 if(Game < StartGame){
 
     ballen.push_back(createBall(BALLKLEIN,1,-1,30,60));

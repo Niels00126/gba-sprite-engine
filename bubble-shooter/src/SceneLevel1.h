@@ -24,7 +24,7 @@
 #define UP -1
 #define Down 1
 
-#define StartGame 1
+#define GAMESTARTED 1
 #include "sprites_front.h"
 #include "background.h"
 #include "Ball.h"
@@ -32,53 +32,56 @@
 
 
 class SceneLevel1: public Scene {
+private:
+    int bulletOffScreen();
+    int bulletcollidesBall();
+    void bulletDelete();
+    void checkBulletHitBall();
+    void ballHitPerson();
+    void dead();
+
 
 
 public:
-    int Game = 0;
-    std::unique_ptr<SpriteBuilder<Sprite>> spriteBuilder;
-    std::unique_ptr<Ball> createBall(int number, int dx, int dy,int posX, int posY);
-    std::unique_ptr<Sprite> createBullet();
-    void shoot();
-    int bullet_offScreen();
-    void check_bullet_hit_ball();
-    void personHit();
-    void ball_hit_person();
-    void dead();
-    void tick_always(u16 keys);
-    void load_always();
+    int scrollX=0;
+    std:: unique_ptr<Sprite> person;
+    std:: unique_ptr<Sprite> ballBig;
+    std:: unique_ptr<Sprite> ballMedium;
+    std:: unique_ptr<Sprite> ballSmall;
+    std:: unique_ptr<Sprite> bullet;
+
+    bool personAllowed2Move = true;
+
+    //virtual void movePerson(int direction);
+    virtual void movePerson(u16 keys);
+    SceneLevel1(std::shared_ptr<GBAEngine> engine, int start_score) : Scene(engine), score(start_score) {}
+    void loadAlways();
+    void tickAlways(u16 keys);
+    int game = 0;
+    u32 bulletCooldown = 0;
     int score = 0;
-    std:: unique_ptr<Sprite> BallBig;
-    std:: unique_ptr<Sprite> BallMedium;
-    std:: unique_ptr<Sprite> BallSmall;
-    std:: unique_ptr<Sprite> Person;
-    std:: unique_ptr<Sprite> Bullet;
-    u32 bulletCooldown=0;
 
-    std::unique_ptr<Background> bg; // background
+    std:: unique_ptr<SpriteBuilder<Sprite>> spriteBuilder;
+    std:: unique_ptr<SpriteBuilder<Sprite>> spriteBuilderBullet;
+    std:: unique_ptr<Ball> createBall(int ballType, int dx, int dy,int posX, int posY);
+    std:: unique_ptr<Sprite> createBullet();
 
-   std::vector<std::unique_ptr<Ball>> ballen;
-   std::vector<std::unique_ptr<Sprite>> bullets;
 
+
+    std::unique_ptr<Background> bg;
+    std::vector<std::unique_ptr<Ball>> ballen;
+    std::vector<std::unique_ptr<Sprite>> bullets;
     std::vector<Sprite *> sprites() override;
-    std::vector<Background *> backgrounds() override;// background
+    std::vector<Background *> backgrounds() override;
 
 
-    int bullet_collides_ball();
-    void bullet_delete();
 
-    //SceneLevel1(std::shared_ptr<GBAEngine> engine, int start_score) : Scene(engine), score(start_score) {}
+    void text();
 
-    SceneLevel1(std::shared_ptr<GBAEngine> engine) : Scene(engine) {}
+    virtual void atStartGame() = 0;
 
-    //virtual void load() override;
-    //virtual void tick(u16 keys) override;
 
-    //virtual void load();
-    //virtual void tick(u16 keys);
 
-    //friend class Level1;
-    //friend class Level2;
 };
 
 

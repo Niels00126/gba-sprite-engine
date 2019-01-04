@@ -9,6 +9,15 @@
 
 
 
+void Level2::atStartGame() {
+    createWall();
+    ballen.push_back(createBall(BALLMIDDEL,1,-1,130,60));
+    ballen.push_back(createBall(BALLGROOT,1,-1,150,90));
+    ballen.push_back(createBall(BALLMIDDEL,-1,-1,10,10));
+
+}
+
+
 std::vector<Sprite *> Level2::sprites() {
     std::vector<Sprite*> sprites;
 
@@ -23,11 +32,11 @@ std::vector<Sprite *> Level2::sprites() {
     }
 
     sprites.push_back(Brick.get());
-    sprites.push_back(BallSmall.get());
-    sprites.push_back(BallBig.get());
-    sprites.push_back(BallMedium.get());
-    sprites.push_back(Bullet.get());
-    sprites.push_back(Person.get());
+    sprites.push_back(ballSmall.get());
+    sprites.push_back(ballBig.get());
+    sprites.push_back(ballMedium.get());
+    sprites.push_back(bullet.get());
+    sprites.push_back(person.get());
     return sprites;
 
 }
@@ -50,15 +59,14 @@ void Level2::ball_collides_wall(){
 }
 
 void Level2::check_open_wall(){
-    TextStream::instance().setText(std::string("SCORE 2: ")+ std::to_string(score), 10, 2);
-    if( ballen.size() <= 2){
+       if( ballen.size() <= 2){
         wall.clear();
     }
 }
 
 int Level2::person_side_of_wall(){
 
-    if((Person->getX()+ Person->getWidth()) <= (WALL_X + Brick->getWidth()/2) ){
+    if((person->getX()+ person->getWidth()) <= (WALL_X + Brick->getWidth()/2) ){
         return RIGHT;
     }
     else{
@@ -88,7 +96,7 @@ return false;
 bool Level2::person_collides_wall(){
 
     for(auto &w : wall){
-        if( Person.get()->collidesWith(*w.get())){
+        if( person.get()->collidesWith(*w.get())){
             return true;
         }
     }
@@ -105,7 +113,7 @@ void Level2::createWall(){
 
 void Level2::load() {
     backgroundPalette = std::unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager(bg_palette, sizeof(bg_palette)));
-    load_always();
+    loadAlways();
 
     Brick = spriteBuilder
             ->withData(wallTiles, sizeof(wallTiles))
@@ -122,40 +130,56 @@ void Level2::load() {
 
 
 
+void Level2:: movePerson(u16 keys) {
+
+    int velx = 2;
+
+    if(bullets.size() >= 2){
+     velx = -2;
+    }
+
+
+
+    if(keys & KEY_RIGHT && check_allowed_move_person(LEFT)) {
+        person->setVelocity(-velx, 0);
+        scrollX--;
+        bg.get()->scroll(scrollX,0);
+    } else if(keys & KEY_LEFT && check_allowed_move_person(RIGHT)) {
+        person->setVelocity(+velx, 0);
+        scrollX++;
+        bg.get()->scroll(scrollX,0);
+    } else {
+        person->setVelocity(0, 0);
+    }
+
+}
+
+
+
 void Level2::tick(u16 keys) {
 
-    tick_always(keys);
+    tickAlways(keys);
 
-    if(keys & KEY_LEFT && check_allowed_move_person(LEFT)) {
-        Person->setVelocity(-2, 0);
-    } else if(keys & KEY_RIGHT && check_allowed_move_person(RIGHT)) {
-        Person->setVelocity(+2, 0);
-    } else {
-        Person->setVelocity(0, 0);
-    }
-
-    if(Game < StartGame){
-        createWall();
-        ballen.push_back(createBall(BALLMIDDEL,1,-1,130,60));
-        ballen.push_back(createBall(BALLGROOT,1,-1,150,90));
-        ballen.push_back(createBall(BALLMIDDEL,-1,-1,10,10));
-        TextStream::instance().setText(std::string("Score: ")+ std::to_string(score), 1, 4);
-        TextStream::instance().setText(std::string("Aantal ballen: ")+ std::to_string(ballen.size()), 6, 0);
-        TextStream::instance().setText(std::string("Aantal bullets: ")+ std::to_string(bullets.size()), 7, 0);
-        TextStream::instance().setText(std::string("Bullet cooldown: ")+ std::to_string(bulletCooldown), 3, 6);
-        Game++;
-    }
-    TextStream::instance().setText(std::string("SIZE OF WALL: ")+ std::to_string(wall.size()), 8, 6);
     ball_collides_wall();
     check_open_wall();
 
+/*
+    if(keys & KEY_LEFT && check_allowed_move_person(LEFT)) {
+        person->setVelocity(-2, 0);
+    } else if(keys & KEY_RIGHT && check_allowed_move_person(RIGHT)) {
+        person->setVelocity(+2, 0);
+    } else {
+        person->setVelocity(0, 0);
+    }
+
+*/
     if(ballen.empty()) {
-        TextStream::instance() << "entered: starting next scene";
+
         if(!engine->isTransitioning()) {
             bullets.clear();
+            TextStream::instance() << "entered: starting next scene";
+            engine->transitionIntoScene(new Level1(engine,score), new FadeOutScene(2));
 
-            //engine->transitionIntoScene(new Level1(engine,score), new FadeOutScene(2));
-            engine->transitionIntoScene(new Level1(engine), new FadeOutScene(2));
         }
     }
 

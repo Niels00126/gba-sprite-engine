@@ -19,9 +19,9 @@ int main (){
 
    //SceneLevel1* startScene = new SceneLevel1(engine);
 
-    Level1* startScene = new Level1(engine);
+    //Level1* startScene = new Level1(engine);
 
-    //Level1* startScene = new Level1(engine,0);
+    Level1* startScene = new Level1(engine,0);
     //Level2* startScene = new Level2(engine,0);
     engine->setScene(startScene);
 

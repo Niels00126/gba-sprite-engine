@@ -11,15 +11,15 @@
 
 class Level1: public SceneLevel1 {
 private:
-    //int score;
-    //std::vector<std::unique_ptr<Ball>> ballen;
-    //std::vector<std::unique_ptr<Sprite>> bullets;
+    void tick(u16 keys) override;
+    void load()override;
+    void atStartGame() override;
+
+    std::unique_ptr<Background> bg2; // background
 public:
 
-    //Level1(std::shared_ptr<GBAEngine> engine,int start_score): SceneLevel1(engine,start_score){}
-    Level1(std::shared_ptr<GBAEngine> engine): SceneLevel1(engine){}
-    void tick(u16 keys);
-    void load();
+    Level1(std::shared_ptr<GBAEngine> engine,int start_score): SceneLevel1(engine,start_score){}
+
 };
 
 
