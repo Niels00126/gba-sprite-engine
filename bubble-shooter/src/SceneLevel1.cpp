@@ -15,23 +15,15 @@
 #define BULLET_COOLDOWN_START 10
 #define ERASE_NOTHING  -1
 
-
-
-
 void SceneLevel1:: bulletDelete(){
 
-    int i = 0;
+    int eraseBullet = bulletOffScreen();
 
-    int numberBulletErase = bulletOffScreen();
-
-    if(  numberBulletErase != ERASE_NOTHING ){
+    if( eraseBullet != ERASE_NOTHING ){
         bulletCooldown +=5;
-        bullets.erase(bullets.begin()+ numberBulletErase);
-
-
+        bullets.erase(bullets.begin()+ eraseBullet);
     }
     return;
-
 }
 
 int SceneLevel1:: bulletOffScreen(){
@@ -60,37 +52,32 @@ void SceneLevel1::ballHitPerson(){
 void SceneLevel1:: dead(){
     TextStream::instance().setText(std::string("You are dead! Je kan er niets meer aan doen!"), 9, 0);
     while(1){}
-
 }
 
-int SceneLevel1:: bulletcollidesBall(){
+int SceneLevel1:: bulletCollidesBall(){
 
     for(auto &bul : bullets){
             int balCnt = 0;
             for(auto &bal : ballen){
-
                 if( bul.get()->collidesWith(*bal->getSprite())){
-
                     score++;
-
-
                     if( bal->getNumber() !=  BALLKLEIN){
                         ballen.push_back(createBall( (bal->getNumber()-1),LEFT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                         ballen.push_back(createBall( (bal->getNumber()-1),RIGHT,UP,bal->getSprite()->getX(),bal->getSprite()->getY()));
                     }
                     bul->moveTo(-100,-100);
                     return balCnt;
-
                 }
                 balCnt++;
             }
     }
+
     return ERASE_NOTHING;
 }
 
 void SceneLevel1:: checkBulletHitBall(){
 
-    int numberBulletErase = bulletcollidesBall();
+    int numberBulletErase = bulletCollidesBall();
 
     if( numberBulletErase != ERASE_NOTHING){
         ballen.erase(ballen.begin()+ numberBulletErase);

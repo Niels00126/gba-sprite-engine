@@ -34,7 +34,7 @@
 class SceneLevel1: public Scene {
 private:
     int bulletOffScreen();
-    int bulletcollidesBall();
+    int bulletCollidesBall();
     void bulletDelete();
     void checkBulletHitBall();
     void ballHitPerson();

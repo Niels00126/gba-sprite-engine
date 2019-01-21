@@ -128,8 +128,6 @@ void Level2::load() {
 
 }
 
-
-
 void Level2:: movePerson(u16 keys) {
 
     int velx = 2;
@@ -153,8 +151,6 @@ void Level2:: movePerson(u16 keys) {
     }
 
 }
-
-
 
 void Level2::tick(u16 keys) {
 
