@@ -15,7 +15,6 @@ private:
     void load()override;
     void atStartGame() override;
 
-    std::unique_ptr<Background> bg2; // background
 public:
 
     Level1(std::shared_ptr<GBAEngine> engine,int start_score): SceneLevel1(engine,start_score){}

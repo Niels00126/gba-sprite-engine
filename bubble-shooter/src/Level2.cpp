@@ -121,7 +121,6 @@ void Level2::load() {
             .withLocation(-40, -40)
             .buildPtr();
 
-    //bg = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob, sizeof(map_spongebob)));
     bg = std::unique_ptr<Background>(new Background(1, wall_window_tiles, sizeof(wall_window_tiles), wall_map, sizeof(wall_map)));
     bg.get()->useMapScreenBlock(16);
 }
@@ -131,12 +130,6 @@ void Level2::load() {
 void Level2:: movePerson(u16 keys) {
 
     int velx = 2;
-
-    if(bullets.size() >= 2){
-     velx = -2;
-    }
-
-
 
     if(keys & KEY_RIGHT && check_allowed_move_person(LEFT)) {
         person->setVelocity(-velx, 0);
@@ -159,16 +152,7 @@ void Level2::tick(u16 keys) {
     ball_collides_wall();
     check_open_wall();
 
-/*
-    if(keys & KEY_LEFT && check_allowed_move_person(LEFT)) {
-        person->setVelocity(-2, 0);
-    } else if(keys & KEY_RIGHT && check_allowed_move_person(RIGHT)) {
-        person->setVelocity(+2, 0);
-    } else {
-        person->setVelocity(0, 0);
-    }
 
-*/
     if(ballen.empty()) {
 
         if(!engine->isTransitioning()) {

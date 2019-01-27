@@ -11,9 +11,6 @@
 #include <libgba-sprite-engine/gba/tonc_bios.h>
 #include <libgba-sprite-engine/gba_engine.h>
 
-
-
-
 void Ball::tick() {
     auto pos = sprite->getPos();
     auto width = sprite->getWidth();
@@ -35,7 +32,3 @@ void Ball::tick() {
     sprite->setVelocity(dx, dy);
 
 }
-
-/*u32 length(VECTOR a) {
-    return Sqrt(a.x * a.x + a.y * a.y);
-}*/

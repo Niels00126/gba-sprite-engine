@@ -222,9 +222,7 @@ void SceneLevel1:: tickAlways(u16 keys){
         game++;
     }
 
-
     movePerson(keys);
-
     bulletDelete();
     checkBulletHitBall();
     ballHitPerson();
@@ -234,21 +232,3 @@ void SceneLevel1:: tickAlways(u16 keys){
 
 }
 
-/*void SceneLevel1::tick(u16 keys) {
-
-    /*if(ballen.empty()) {
-        if(!engine->isTransitioning()) {
-            TextStream::instance() << "entered: starting next scene";
-            engine->transitionIntoScene(new SceneLevel2(engine), new FadeOutScene(2));
-        }
-    }*/
-/*tickAlways(keys);
-if(Game < StartGame){
-
-    ballen.push_back(createBall(BALLKLEIN,1,-1,30,60));
-    ballen.push_back(createBall(BALLMIDDEL,1,-1,50,90));
-    ballen.push_back(createBall(BALLGROOT,1,-1,70,100));
-    Game++;
-}
-}
-*/

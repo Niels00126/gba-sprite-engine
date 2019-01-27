@@ -20,12 +20,8 @@ void Level1::atStartGame() {
 
 void Level1::load() {
     backgroundPalette = std::unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager(background_tiles_spongebobPal, sizeof(background_tiles_spongebobPal)));
-
     loadAlways();
-
     bg = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob_normal_map, sizeof(map_spongebob_normal_map)));
-    //bg2 = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob_blink, sizeof(map_spongebob_blink)));
-   // bg->setMap(map_spongebob_blink);
     bg.get()->useMapScreenBlock(16);
 }
 
