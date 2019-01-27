@@ -7,7 +7,7 @@
 
 #define WALL_X  100
 
-
+//
 
 void Level2::atStartGame() {
     createWall();
@@ -112,7 +112,7 @@ void Level2::createWall(){
 }
 
 void Level2::load() {
-    backgroundPalette = std::unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager(bg_palette, sizeof(bg_palette)));
+    backgroundPalette = std::unique_ptr<BackgroundPaletteManager>(new BackgroundPaletteManager(wall_windowPal, sizeof(wall_windowPal)));
     loadAlways();
 
     Brick = spriteBuilder
@@ -122,11 +122,11 @@ void Level2::load() {
             .buildPtr();
 
     //bg = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob, sizeof(map_spongebob)));
-    bg = std::unique_ptr<Background>(new Background(1, background_data, sizeof(background_data), map, sizeof(map)));
+    bg = std::unique_ptr<Background>(new Background(1, wall_window_tiles, sizeof(wall_window_tiles), wall_map, sizeof(wall_map)));
     bg.get()->useMapScreenBlock(16);
-
-
 }
+
+
 
 void Level2:: movePerson(u16 keys) {
 

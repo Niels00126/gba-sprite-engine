@@ -23,9 +23,9 @@ void Level1::load() {
 
     loadAlways();
 
-    bg = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob_normal, sizeof(map_spongebob_normal)));
-    bg2 = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob_blink, sizeof(map_spongebob_blink)));
-    bg->setMap(map_spongebob_blink);
+    bg = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob_normal_map, sizeof(map_spongebob_normal_map)));
+    //bg2 = std::unique_ptr<Background>(new Background(1, background_tiles_spongebobTiles, sizeof(background_tiles_spongebobTiles), map_spongebob_blink, sizeof(map_spongebob_blink)));
+   // bg->setMap(map_spongebob_blink);
     bg.get()->useMapScreenBlock(16);
 }
 
